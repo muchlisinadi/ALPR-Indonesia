@@ -1,31 +1,32 @@
 # ALPR-Indonesian-plate
-This code is for automatic license plate recognition in indonesian plate, which have black background and white number
+Automatic license plate recognition for Indonesian plate (black background and white number)
 
-method we use was k-Nearest Neighbour for recognize chars in image
+This code was the adjustment version from :
+https://github.com/MicrocontrollersAndMore/OpenCV_3_License_Plate_Recognition_Python
 
-for more information about knn:
-https://docs.opencv.org/3.4/d5/d26/tutorial_py_knn_understanding.html
+## Methods:
+- [How it works](https://www.youtube.com/watch?v=fJcl6Gw1D8k)
+- [KNN](https://docs.opencv.org/3.4/d5/d26/tutorial_py_knn_understanding.html)
 
-## for use in linux just:
+## How to run (Linux):
+- Calibrate the camera and threshold
+  `python Main.py -c <image_dir>` 
+- Cam
+  `python Main.py`
+- Image
+  `python Main.py -i <image_file_dir>`
+- Video
+  `python Main.py -v <video_file_dir>`
 
-python Main.py -c directoryFileImage = calibrating the camera and threshold
+## Retrain
+Retrain process will update classifications.txt and flattened_images.txt files
+`python GenData.py -d = <train_image>`
+example : `python GenData.py -d = train_image/train2.png`<br>
+note: *Just input base on marked object one by one and press esc to exit the training process*
 
-python Main.py   = use with cam
+### Check the classification model
+`python TrainAndTestData.py -d = train_image/train2.png`
 
-python Main.py -i directoryFileImage = recognition an image
-
-python Main.py -v directoryFileVideo = recognition a video
-
-## To retrain training data of classifications.txt and flattened_images.txt:
-
-python GenData.py -d = train_image/train2.png
-
-after that you train by yourself, one by one. just input base on marked object
-and press esc to exit the training process
-
-## to check your classification is good enough
-
-python TrainAndTestData.py -d = train_image/train2.png
-
-## if you want to invert the image that you want to train
-python invert_imageData.py -d = train_image/train2.png
+## Tools
+### invert image for train process
+`python invert_imageData.py -d = train_image/train2.png`
