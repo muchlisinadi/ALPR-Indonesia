@@ -1,32 +1,42 @@
 # ALPR-Indonesian-plate
 Automatic license plate recognition for Indonesian plate (black background and white number)
 
-This code was the adjustment version from :
+This code was the adjustment version from :<br>
 https://github.com/MicrocontrollersAndMore/OpenCV_3_License_Plate_Recognition_Python
 
 ## Methods:
-- [How it works](https://www.youtube.com/watch?v=fJcl6Gw1D8k)
+- [Video Explanation](https://www.youtube.com/watch?v=fJcl6Gw1D8k)
 - [KNN](https://docs.opencv.org/3.4/d5/d26/tutorial_py_knn_understanding.html)
+<br>
+*note : <br>It is recommended to use a newer method like yolo or ssd. <br>or you can read the state of the art of object detection [here](https://paperswithcode.com/task/object-detection)
+
+## Prerequest
+- python==3.6
+- opencv-python==4.1.1.26
+- numpy==1.17.3<br>
+or install using<br>
+`pip install -r requirements.txt`
 
 ## How to run (Linux):
-- Calibrate the camera and threshold
+- Calibrate the camera and threshold<br>
   `python Main.py -c <image_dir>` 
-- Cam
+- Cam<br>
   `python Main.py`
-- Image
+- Image<br>
   `python Main.py -i <image_file_dir>`
-- Video
+- Video<br>
   `python Main.py -v <video_file_dir>`
 
 ## Retrain
-Retrain process will update classifications.txt and flattened_images.txt files
-`python GenData.py -d = <train_image>`
-example : `python GenData.py -d = train_image/train2.png`<br>
+Retrain process will update classifications.txt and flattened_images.txt files<br>
+`python GenData.py -d = <train_image>`<br>
+example : <br>
+`python GenData.py -d = train_image/train2.png`<br>
 note: *Just input base on marked object one by one and press esc to exit the training process*
 
-### Check the classification model
+### Check the model
 `python TrainAndTestData.py -d = train_image/train2.png`
 
 ## Tools
-### invert image for train process
+- Invert image:<br>
 `python invert_imageData.py -d = train_image/train2.png`

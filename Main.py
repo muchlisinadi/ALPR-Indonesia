@@ -46,8 +46,7 @@ def main():
     if args.get("calibration", True):
         imgOriginalScene = cv2.imread(args["calibration"])
         if imgOriginalScene is None:
-    		print("   Please check again the path of image or argument !")
-
+            print("Please check again the path of image or argument !")
         imgOriginalScene  = imutils.resize(imgOriginalScene, width = 720)
         cal.calibration(imgOriginalScene)
         return
@@ -55,14 +54,14 @@ def main():
     if args.get("video", True):
         camera = cv2.VideoCapture(args["video"])
         if camera is None:
-    		print("   Please check again the path of video or argument !")
+            print("Please check again the path of video or argument !")
         loop = True
 
     elif args.get("image", True):
         imgOriginalScene = cv2.imread(args["image"])
         if imgOriginalScene is None:
-    		print("   Please check again the path of image or argument !")
-        loop = False
+            print("Please check again the path of image or argument !")
+            loop = False
     else:
         camera = cv2.VideoCapture(0)
         loop = True
@@ -124,7 +123,7 @@ def main():
         cv2.putText(imgOriginalScene,"Press 's' to save frame to be 'save.png', for calibrating",(10,30),cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,255,255),1,bottomLeftOrigin = False)
         #drawRedRectangleAroundPlate(imgOriginalScene, imgOriginalScene)
 
-        cv2.rectangle(imgOriginalScene,((imgOriginalScene.shape[1]/2-230),(imgOriginalScene.shape[0]/2-80)),((imgOriginalScene.shape[1]/2+230),(imgOriginalScene.shape[0]/2+80)),SCALAR_GREEN,3)
+        cv2.rectangle(imgOriginalScene,((imgOriginalScene.shape[1]//2-230),(imgOriginalScene.shape[0]//2-80)),((imgOriginalScene.shape[1]//2+230),(imgOriginalScene.shape[0]//2+80)),SCALAR_GREEN,3)
         cv2.imshow("imgOriginalScene", imgOriginalScene)
         #cv2.imshow("ori", frame)
 
