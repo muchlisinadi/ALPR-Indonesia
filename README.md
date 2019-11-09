@@ -1,4 +1,4 @@
-# ALPR-Indonesian-plate
+# ALPR Indonesia
 Automatic license plate recognition for Indonesian plate **(White on black)**<br>
 
 This code was the adjustment version from :<br>
