@@ -92,15 +92,16 @@ def main():
             print("no characters were detected\n")
         else:
             if len(licenses_verify) == N_VERIFY and len(set(licenses_verify)) == 1:
-                if prev_license == licenses_verify[-1]:
+                if prev_license == new_license:
                     print(f"still = {prev_license}\n")
                 else:
-                    prev_license = licenses_verify[-1]
                     # show and save verified plate
-                    print(f"A new license plate read from image = {prev_license} \n")
-                    cv2.imshow(prev_license, img_original_scene)
-                    file_name = f"hasil/{prev_license}.png"
+                    print(f"A new license plate read from image = {new_license} \n")
+                    cv2.imshow(new_license, img_original_scene)
+                    file_name = f"hasil/{new_license}.png"
                     cv2.imwrite(file_name, img_original_scene)
+                    prev_license = new_license
+                    licenses_verify = []
             else:
                 if len(licenses_verify) == N_VERIFY:
                     # drop first if reach the N_VERIFY
