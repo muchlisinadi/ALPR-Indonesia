@@ -18,7 +18,7 @@ def main():
     if args.get("image", True):
         imgTrainingNumbers = cv2.imread(args["image_train"]) # read in training numbers image
         if imgTrainingNumbers is None:
-            print "error: image not read from file \n\n"        # print error message to std out
+            print("error: image not read from file \n\n")        # print error message to std out
             os.system("pause")                                  # pause so user can see error message
             return
     else:
