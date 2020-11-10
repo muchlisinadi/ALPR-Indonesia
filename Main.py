@@ -4,16 +4,16 @@
 # python Main.py @ untuk cam
 
 
-import imutils
 import argparse
-import cv2
-import numpy as np
-import Preprocess as pp
 import os
-import Calibration as cal
 
+import cv2
+
+import Calibration as cal
 import DetectChars
 import DetectPlates
+import Preprocess as pp
+import imutils
 
 # Module level variables for image ##########################################################################
 
@@ -24,7 +24,6 @@ SCALAR_GREEN = (0.0, 255.0, 0.0)
 SCALAR_RED = (0.0, 0.0, 255.0)
 N_VERIFY = 5  # number of verification
 
-# Main ##################################################################################################
 
 def main():
     # argument for input video/image/calibration
@@ -33,7 +32,11 @@ def main():
     ap.add_argument("-i", "--image", help="Path to the image")
     ap.add_argument("-c", "--calibration", help="image or video or camera")
     args = vars(ap.parse_args())
-    loop = False
+
+
+    img_original_scene = None
+    loop = None
+    camera = None
 
     # if -c assigned, calibrate the angle of camera or video
     if args.get("calibration", True):
@@ -85,30 +88,32 @@ def main():
         img_original_scene, new_license = searching(img_original_scene, loop)
 
         # only save 5 same license each time (verification)
-        if len(licenses_verify) == N_VERIFY and len(set(licenses_verify)) == 1:
-            if prev_license == licenses_verify[-1]:
-                print(f"still = {prev_license}\n")
-            else:
-                prev_license = licenses_verify[-1]
-                # show and save verified plate
-                print(f"A new license plate read from image = {prev_license} \n")
-                cv2.imshow(prev_license, img_original_scene)
-                file_name = f"hasil/{prev_license}.png"
-                cv2.imwrite(file_name, img_original_scene)
+        if new_license == "":
+            print("no characters were detected\n")
         else:
-            if new_license == "":
-                print("no characters were detected\n")
+            if len(licenses_verify) == N_VERIFY and len(set(licenses_verify)) == 1:
+                if prev_license == licenses_verify[-1]:
+                    print(f"still = {prev_license}\n")
+                else:
+                    prev_license = licenses_verify[-1]
+                    # show and save verified plate
+                    print(f"A new license plate read from image = {prev_license} \n")
+                    cv2.imshow(prev_license, img_original_scene)
+                    file_name = f"hasil/{prev_license}.png"
+                    cv2.imwrite(file_name, img_original_scene)
             else:
                 if len(licenses_verify) == N_VERIFY:
                     # drop first if reach the N_VERIFY
                     licenses_verify = licenses_verify[1:]
                 licenses_verify.append(new_license)
 
-        # add text and rectangle, just for information
+        # add text and rectangle, just for information and bordering
         cv2.putText(img_original_scene, "Press 's' to save frame to be 'save.png', for calibrating", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, bottomLeftOrigin=False)
-        cv2.rectangle(img_original_scene, ((img_original_scene.shape[1] // 2 - 230), (img_original_scene.shape[0] // 2 - 80)),
-                      ((img_original_scene.shape[1] // 2 + 230), (img_original_scene.shape[0] // 2 + 80)), SCALAR_GREEN, 3)
+        cv2.rectangle(img_original_scene,
+                      ((img_original_scene.shape[1] // 2 - 230), (img_original_scene.shape[0] // 2 - 80)),
+                      ((img_original_scene.shape[1] // 2 + 230), (img_original_scene.shape[0] // 2 + 80)), SCALAR_GREEN,
+                      3)
         cv2.imshow("imgOriginalScene", img_original_scene)
 
         key = cv2.waitKey(5) & 0xFF
@@ -124,8 +129,8 @@ def main():
             save_number = int(save_number)
             save_number = save_number + 1
         if key == 27:  # if the 'q' key is pressed, stop the loop
-            break
             camera.release()  # cleanup the camera and close any open windows
+            break
 
     # For image only
     if not loop:
@@ -141,12 +146,14 @@ def main():
     cv2.destroyAllWindows()
     return
 
+
 def drawRedRectangleAroundPlate(imgOriginalScene, licPlate):
     p2fRectPoints = cv2.boxPoints(licPlate.rrLocationOfPlateInScene)  # get 4 vertices of rotated rect
     cv2.line(imgOriginalScene, tuple(p2fRectPoints[0]), tuple(p2fRectPoints[1]), SCALAR_RED, 2)  # draw 4 red lines
     cv2.line(imgOriginalScene, tuple(p2fRectPoints[1]), tuple(p2fRectPoints[2]), SCALAR_RED, 2)
     cv2.line(imgOriginalScene, tuple(p2fRectPoints[2]), tuple(p2fRectPoints[3]), SCALAR_RED, 2)
     cv2.line(imgOriginalScene, tuple(p2fRectPoints[3]), tuple(p2fRectPoints[0]), SCALAR_RED, 2)
+
 
 def writeLicensePlateCharsOnImage(imgOriginalScene, licPlate):
     ptCenterOfTextAreaX = 0  # this will be the center of the area the text will be written to
@@ -193,6 +200,7 @@ def writeLicensePlateCharsOnImage(imgOriginalScene, licPlate):
     cv2.putText(imgOriginalScene, licPlate.strChars, (ptLowerLeftTextOriginX, ptLowerLeftTextOriginY), intFontFace,
                 fltFontScale, SCALAR_YELLOW, intFontThickness)
 
+
 def searching(imgOriginalScene, loop):
     licenses = ""
     if imgOriginalScene is None:  # if image was not read successfully
@@ -200,52 +208,50 @@ def searching(imgOriginalScene, loop):
         os.system("pause")  # pause so user can see error message
         return
         # end if
-    listOfPossiblePlates = DetectPlates.detectPlatesInScene(imgOriginalScene)  # detect plates
-    # time.sleep(0.02)
-    listOfPossiblePlates = DetectChars.detectCharsInPlates(listOfPossiblePlates)  # detect chars in plates
-    # time.sleep(0.05)
 
-    if (loop == False):
+    # detect plates
+    listOfPossiblePlates = DetectPlates.detectPlatesInScene(imgOriginalScene)
+    # detect chars in plates
+    listOfPossiblePlates = DetectChars.detectCharsInPlates(listOfPossiblePlates)
+
+    if not loop:
         cv2.imshow("imgOriginalScene", imgOriginalScene)
 
     if len(listOfPossiblePlates) == 0:
-        if (loop == False):  # if no plates were found
+        if not loop:  # if no plates were found
             print("no license plates were detected\n")  # inform user no plates were found
     else:  # else
         # if we get in here list of possible plates has at leat one plate
 
         # sort the list of possible plates in DESCENDING order (most number of chars to least number of chars)
         listOfPossiblePlates.sort(key=lambda possiblePlate: len(possiblePlate.strChars), reverse=True)
-        # suppose the plate with the most recognized chars (the first plate in sorted by string length descending order) is the actual plate
+        # suppose the plate with the most recognized chars (the first plate in sorted by string length descending
+        # order) is the actual plate
         licPlate = listOfPossiblePlates[0]
 
-        if (loop == False):
+        if not loop:
             cv2.imshow("imgPlate", licPlate.imgPlate)  # show crop of plate and threshold of plate
             cv2.imshow("imgThresh", licPlate.imgThresh)
 
         if len(licPlate.strChars) == 0:  # if no chars were found in the plate
-            if (loop == False):
+            if not loop:
                 print("no characters were detected\n")
                 return  # show message
             # end if
         drawRedRectangleAroundPlate(imgOriginalScene, licPlate)
         writeLicensePlateCharsOnImage(imgOriginalScene, licPlate)
         licenses = licPlate.strChars
-        # if ((licenses[0] and licenses[len(licenses)-1])  == ('0' or '1' or '2' or '3' or '4' or  '5' or '6' or '7' or '8' or '9')):
-        #     licenses = ""
-        #     print("license plate False !! \n and ")
-        # draw red rectangle around plate
-        # print (licenses)
-        # print(licPlate)
-        if (loop == False):
+
+        if not loop:
             print("license plate read from image = " + licPlate.strChars + "\n")  # write license plate text to std out
             # write license plate text on the image
 
-        if (loop == False):
+        if not loop:
             cv2.imshow("imgOriginalScene", imgOriginalScene)  # re-show scene image
             cv2.imwrite("imgOriginalScene.png", imgOriginalScene)
 
     return imgOriginalScene, licenses
+
 
 if __name__ == "__main__":
     main()
